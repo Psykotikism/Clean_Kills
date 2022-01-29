@@ -65,9 +65,9 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 #define CK_TAG5 "\x04[CK]\x05"
 
 // Clean kill types
-#define CK_TYPE_BOOMER (1 << 0)
-#define CK_TYPE_SMOKER (1 << 1)
-#define CK_TYPE_SPITTER (1 << 2)
+#define CK_TYPE_BOOMER (1 << 0) // Boomer
+#define CK_TYPE_SMOKER (1 << 1) // Smoker
+#define CK_TYPE_SPITTER (1 << 2) // Spitter
 
 enum struct esGeneral
 {
@@ -135,6 +135,7 @@ public void OnPluginStart()
 			vSetupPatch(g_esGeneral.g_mpBoomerKill[0], gdCleanKills, "CKPatch_Boomer1CleanKill");
 			vSetupPatch(g_esGeneral.g_mpBoomerKill[1], gdCleanKills, "CKPatch_Boomer2CleanKill");
 			vSetupPatch(g_esGeneral.g_mpBoomerKill[2], gdCleanKills, "CKPatch_Boomer3CleanKill");
+
 			vSetupPatch(g_esGeneral.g_mpSmokerKill[0], gdCleanKills, "CKPatch_Smoker1CleanKill");
 			vSetupPatch(g_esGeneral.g_mpSmokerKill[1], gdCleanKills, "CKPatch_Smoker2CleanKill");
 			vSetupPatch(g_esGeneral.g_mpSmokerKill[2], gdCleanKills, "CKPatch_Smoker3CleanKill");
@@ -145,6 +146,7 @@ public void OnPluginStart()
 				vSetupPatch(g_esGeneral.g_mpBoomerKill[3], gdCleanKills, "CKPatch_Boomer4CleanKill");
 				vSetupPatch(g_esGeneral.g_mpBoomerKill[4], gdCleanKills, "CKPatch_Boomer5CleanKill");
 				vSetupPatch(g_esGeneral.g_mpBoomerKill[5], gdCleanKills, "CKPatch_Boomer6CleanKill");
+
 				vSetupPatch(g_esGeneral.g_mpSpitterKill, gdCleanKills, "CKPatch_SpitterCleanKill");
 			}
 
@@ -242,7 +244,6 @@ MRESReturn mreEventKilledPre(int pThis, DHookParam hParams)
 		int iTypes = (g_iCleanKillTypes[iAttacker] != 0) ? g_iCleanKillTypes[iAttacker] : g_esGeneral.g_cvCKKillTypes.IntValue;
 		if (iTypes > 0)
 		{
-			bool bBoomer = bIsBoomer(pThis, CK_CHECK_INDEX|CK_CHECK_INGAME), bSmoker = bIsSmoker(pThis, CK_CHECK_INDEX|CK_CHECK_INGAME);
 			if (bIsBoomer(pThis, CK_CHECK_INDEX|CK_CHECK_INGAME) && (iTypes & CK_TYPE_BOOMER))
 			{
 				g_esGeneral.g_mpBoomerKill[0].Enable();
