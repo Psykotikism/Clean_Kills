@@ -1,0 +1,790 @@
+"Games"
+{
+	"#default"
+	{
+		"#supported"
+		{
+			"game"		"left4dead"
+			"game"		"left4dead2"
+		}
+
+		"Functions"
+		{
+			/**
+			 * CTerrorPlayer::Event_Killed(CTakeDamageInfo const&)
+			 *
+			 * Note: Detouring as a pre-hook for patching special infected kill effects per player.
+			 * Note: Detouring as a post-hook for removing patches for special infected kill effects.
+			 **/
+			"CKDetour_CTerrorPlayer::Event_Killed"
+			{
+				"signature"	"CTerrorPlayer::Event_Killed"
+				"callconv"	"thiscall"
+				"return"	"void"
+				"this"		"entity"
+				"arguments"
+				{
+					"info"
+					{
+						"type"		"objectptr"
+					}
+				}
+			}
+		}
+	}
+
+	"left4dead"
+	{
+		"MemPatches"
+		{
+			/**
+			 * CTerrorPlayer::Event_Killed(CTakeDamageInfo const&)
+			 *
+			 * Note: Patches the "DispatchParticleEffect" call for "boomer_explode".
+			 *
+			 * How to find:
+			 * 1. Locate the "boomer_explode" string.
+			 * 2. The instruction should look like a function call.
+			 **/
+			"CKPatch_Boomer1CleanKill"
+			{
+				"signature"		"CTerrorPlayer::Event_Killed"
+				"linux"
+				{
+					"offset"		"7186" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"mac"
+				{
+					"offset"		"6361" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"windows"
+				{
+					"offset"		"5114" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+			}
+
+			/**
+			 * CTerrorPlayer::Event_Killed(CTakeDamageInfo const&)
+			 *
+			 * Note: Patches the "CBaseEntity::EmitSound" call for "BoomerZombie.Detonate".
+			 *
+			 * How to find:
+			 * 1. Locate the "BoomerZombie.Detonate" string.
+			 * 2. The instruction should look like a function call.
+			 **/
+			"CKPatch_Boomer2CleanKill"
+			{
+				"signature"		"CTerrorPlayer::Event_Killed"
+				"linux"
+				{
+					"offset"		"7220" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"mac"
+				{
+					"offset"		"6395" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"windows"
+				{
+					"offset"		"5137" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+			}
+
+			/**
+			 * CTerrorPlayer::Event_Killed(CTakeDamageInfo const&)
+			 *
+			 * Note: Patches the "CreateExplosion" call.
+			 *
+			 * How to find:
+			 * 1. Locate the "boomer_exploded" string.
+			 * 2. The function is located in the previous code block above that function call.
+			 * 3. The instruction should look like a function call.
+			 **/
+			"CKPatch_Boomer3CleanKill"
+			{
+				"signature"		"CTerrorPlayer::Event_Killed"
+				"linux"
+				{
+					"offset"		"5752" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"mac"
+				{
+					"offset"		"6201" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"windows"
+				{
+					"offset"		"5255" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+			}
+
+			/**
+			 * CTerrorPlayer::Event_Killed(CTakeDamageInfo const&)
+			 *
+			 * Note: Patches the "CBaseEntity::EmitSound" call for "SmokerZombie.Explode".
+			 * Note for Windows users: The server crashes when patching 5 bytes with NOPs (0x90), so do a jump (JMP) instruction instead.
+			 *
+			 * How to find:
+			 * 1. Locate the "SmokerZombie.Explode" string.
+			 * 2. The instruction should look like a function call.
+			 **/
+			"CKPatch_Smoker1CleanKill"
+			{
+				"signature"		"CTerrorPlayer::Event_Killed"
+				"linux"
+				{
+					"offset"		"7366" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"mac"
+				{
+					"offset"		"5274" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"windows"
+				{
+					"offset"		"5502" // start at D9 and patch 2 bytes with a short jump (0xEB) to skip instruction
+					"verify"		"\xD9"
+					"patch"			"\xEB\x12"
+				}
+			}
+
+			/**
+			 * CTerrorPlayer::Event_Killed(CTakeDamageInfo const&)
+			 *
+			 * Note: Patches the "DispatchParticleEffect" call for "smoker_smokecloud".
+			 *
+			 * How to find:
+			 * 1. Locate the "smoker_smokecloud" string.
+			 * 2. The instruction should look like a function call.
+			 **/
+			"CKPatch_Smoker2CleanKill"
+			{
+				"signature"		"CTerrorPlayer::Event_Killed"
+				"linux"
+				{
+					"offset"		"7529" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"mac"
+				{
+					"offset"		"5488" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"windows"
+				{
+					"offset"		"5578" // start at 8B and patch 2 bytes with a short jump (0xEB) to skip instruction
+					"verify"		"\x8B"
+					"patch"			"\xEB\x3A"
+				}
+			}
+
+			/**
+			 * CTerrorPlayer::Event_Killed(CTakeDamageInfo const&)
+			 *
+			 * Note: Patches the "DispatchParticleEffect" call for "smoker_smokecloud_camera".
+			 *
+			 * How to find:
+			 * 1. Locate the "smoker_smokecloud_camera" string.
+			 * 2. The instruction should look like a function call.
+			 **/
+			"CKPatch_Smoker3CleanKill"
+			{
+				"signature"		"CTerrorPlayer::Event_Killed"
+				"linux"
+				{
+					"offset"		"7712" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"mac"
+				{
+					"offset"		"5712" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"windows"
+				{
+					"offset"		"5766" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+			}
+
+			/**
+			 * CSmokeCloudSystem::FireGameEvent(IGameEvent *)
+			 *
+			 * Note: Patches the "CSmokeCloudSystem::FireGameEvent" function to return early.
+			 *
+			 * How to find:
+			 * 1. Locate the "CSmokeCloudSystem::FireGameEvent" and start at the beginning of the function.
+			 **/
+			"CKPatch_Smoker4CleanKill"
+			{
+				"signature"		"CSmokeCloudSystem::FireGameEvent"
+				"linux"
+				{
+					"offset"		"0" // change 57 to C3
+					"verify"		"\x57"
+					"patch"			"\xC3"
+				}
+				"mac"
+				{
+					"offset"		"0" // change 57 to C3
+					"verify"		"\x57"
+					"patch"			"\xC3"
+				}
+				"windows"
+				{
+					"offset"		"0" // change 83 ?? ?? to C2 04 00
+					"verify"		"\x83"
+					"patch"			"\xC2\x04\x00"
+				}
+			}
+		}
+
+		"Offsets"
+		{
+			/**
+			 * CTerrorPlayer::Event_Killed(CTakeDamageInfo const&)
+			 *
+			 * Note: This is the offset for the "m_hAttacker" member variable in the "CTakeDamageInfo" class.
+			 *
+			 * How to find:
+			 * 1. Look in the alliedmodders/hl2sdk-l4d "takedamageinfo.h" file.
+			 * 2. Each member variable takes up 4 bytes for each of its cells (12 bytes for floats).
+			 **/
+			"CTerrorPlayer::Event_Killed::Attacker"
+			{
+				"linux"		"40"
+				"mac"		"40"
+				"windows"	"40"
+			}
+		}
+
+		"Signatures"
+		{
+			/**
+			 * CSmokeCloudSystem::FireGameEvent(IGameEvent *)
+			 *
+			 * How to find on Windows:
+			 * 1. Find the function's offsets with asherkin's VTable dump.
+			 * 2. In IDA Pro, go to the ".rdata" section of the Windows binary.
+			 * 3. Search for "CSmokeCloudSystem::`vftable'" to jump to the "CSmokeCloudSystem" vtable.
+			 * 4. Compare your dump's offsets with asherkin's dump's offsets to find the target function.
+			 * 5. Look for the target function in the Windows binary.
+			 **/
+			"CSmokeCloudSystem::FireGameEvent"
+			{
+				"library"	"server"
+				"linux"		"@_ZN17CSmokeCloudSystem13FireGameEventEP10IGameEvent" // change 57 to C3
+				"mac"		"@_ZN17CSmokeCloudSystem13FireGameEventEP10IGameEvent" // change 57 to C3
+				"windows"	"\x83\x2A\x2A\x56\x8B\x2A\x2A\x2A\x8B\x2A\x8B\x2A\x2A\x57\x8B\x2A\x8B\x2A\xFF\x2A\x3D\x2A\x2A\x2A\x2A\x74\x2A\x68\x2A\x2A\x2A\x2A\x50\xE8\x2A\x2A\x2A\x2A\x83\x2A\x2A\x85\x2A\x0F\x85\x2A\x2A\x2A\x2A\x8B\x2A\x8B\x2A\x2A\x6A\x2A\x68\x2A\x2A\x2A\x2A\x8B\x2A\xFF\x2A\x50\xE8\x2A\x2A\x2A\x2A\x8B"
+						/* 83 ? ? 56 8B ? ? ? 8B ? 8B ? ? 57 8B ? 8B ? FF ? 3D ? ? ? ? 74 ? 68 ? ? ? ? 50 E8 ? ? ? ? 83 ? ? 85 ? 0F 85 ? ? ? ? 8B ? 8B ? ? 6A ? 68 ? ? ? ? 8B ? FF ? 50 E8 ? ? ? ? 8B */ // change 83 ?? ?? to C2 04 00
+			}
+
+			/**
+			 * CTerrorPlayer::Event_Killed(CTakeDamageInfo const&)
+			 *
+			 * How to find on Windows:
+			 * 1a. Search for any of the following strings (they can each only be found in this function):
+			 * - "blood_bleedout"
+			 * - "SubjectIsA:%s,Distance:%f"
+			 * - "KilledZombie"
+			 * - "DeadCharacter:"
+			 * - ",SubjectTeam:Survivor"
+			 * - "SurvivorDied"
+			 * - "infected_explosive_barrel_kill"
+			 * - "boomer_exploded"
+			 * - "splashedbile"
+			 *
+			 * 1b. Find the function's offsets with asherkin's VTable dump.
+			 * 2b. In IDA Pro, go to the ".rdata" section of the Windows binary.
+			 * 3b. Search for "CTerrorPlayer::`vftable'" to jump to the "CTerrorPlayer" vtable.
+			 * 4b. Compare your dump's offsets with asherkin's dump's offsets to find the target function.
+			 * 5b. Look for the target function in the Windows binary.
+			 **/
+			"CTerrorPlayer::Event_Killed"
+			{
+				"library"	"server"
+				"linux"		"@_ZN13CTerrorPlayer12Event_KilledERK15CTakeDamageInfo"
+				"mac"		"@_ZN13CTerrorPlayer12Event_KilledERK15CTakeDamageInfo"
+				"windows"	"\x2A\x2A\x2A\x2A\x2A\x2A\x53\x55\x56\x8B\x2A\x8B\x2A\x8B\x90\x2A\x2A\x2A\x2A\x57\xFF\x2A\x88"
+						/* ? ? ? ? ? ? 53 55 56 8B ? 8B ? 8B 90 ? ? ? ? 57 FF ? 88 */
+			}
+		}
+	}
+
+	"left4dead2"
+	{
+		"MemPatches"
+		{
+			/**
+			 * CTerrorPlayer::Event_Killed(CTakeDamageInfo const&)
+			 *
+			 * Note: Patches the "DispatchParticleEffect" call for "boomer_explode".
+			 *
+			 * How to find:
+			 * 1. Locate the "boomer_explode" string.
+			 * 2. There should be two references to the string.
+			 * 3. This patch will be for the first reference.
+			 * 2. The instruction should look like a function call.
+			 **/
+			"CKPatch_Boomer1CleanKill"
+			{
+				"signature"		"CTerrorPlayer::Event_Killed"
+				"linux"
+				{
+					"offset"		"10925" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"mac"
+				{
+					"offset"		"11897" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"windows"
+				{
+					"offset"		"7411" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+			}
+
+			/**
+			 * CTerrorPlayer::Event_Killed(CTakeDamageInfo const&)
+			 *
+			 * Note: Patches the "CBaseEntity::EmitSound" call for "BoomerZombie.Detonate".
+			 *
+			 * How to find:
+			 * 1. Locate the "BoomerZombie.Detonate" string.
+			 * 2. There should be two references to the string.
+			 * 3. This patch will be for the first reference.
+			 * 2. The instruction should look like a function call.
+			 **/
+			"CKPatch_Boomer2CleanKill"
+			{
+				"signature"		"CTerrorPlayer::Event_Killed"
+				"linux"
+				{
+					"offset"		"10957" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"mac"
+				{
+					"offset"		"11931" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"windows"
+				{
+					"offset"		"7434" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+			}
+
+			/**
+			 * CTerrorPlayer::Event_Killed(CTakeDamageInfo const&)
+			 *
+			 * Note: Patches the "CreateExplosion" call.
+			 *
+			 * How to find:
+			 * 1. Locate the "BoomerZombie.Detonate" string.
+			 * 2. There should be two references to the string.
+			 * 3. This patch will use the first reference.
+			 * 4. The function is the second function call after the string reference.
+			 * 5. The instruction should look like a function call.
+			 **/
+			"CKPatch_Boomer3CleanKill"
+			{
+				"signature"		"CTerrorPlayer::Event_Killed"
+				"linux"
+				{
+					"offset"		"8228" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"mac"
+				{
+					"offset"		"11727" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"windows"
+				{
+					"offset"		"7749" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+			}
+
+			/**
+			 * CTerrorPlayer::Event_Killed(CTakeDamageInfo const&)
+			 *
+			 * Note: Patches the "DispatchParticleEffect" call for "boomer_explode".
+			 *
+			 * How to find:
+			 * 1. Locate the "boomer_explode" string.
+			 * 2. There should be two references to the string.
+			 * 3. This patch will be for the second reference.
+			 * 2. The instruction should look like a function call.
+			 **/
+			"CKPatch_Boomer4CleanKill"
+			{
+				"signature"		"CTerrorPlayer::Event_Killed"
+				"linux"
+				{
+					"offset"		"6353" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"mac"
+				{
+					"offset"		"11305" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"windows"
+				{
+					"offset"		"7603" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+			}
+
+			/**
+			 * CTerrorPlayer::Event_Killed(CTakeDamageInfo const&)
+			 *
+			 * Note: Patches the "CBaseEntity::EmitSound" call for "BoomerZombie.Detonate".
+			 *
+			 * How to find:
+			 * 1. Locate the "BoomerZombie.Detonate" string.
+			 * 2. There should be two references to the string.
+			 * 3. This patch will be for the second reference.
+			 * 2. The instruction should look like a function call.
+			 **/
+			"CKPatch_Boomer5CleanKill"
+			{
+				"signature"		"CTerrorPlayer::Event_Killed"
+				"linux"
+				{
+					"offset"		"6385" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"mac"
+				{
+					"offset"		"11339" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"windows"
+				{
+					"offset"		"7626" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+			}
+
+			/**
+			 * CTerrorPlayer::Event_Killed(CTakeDamageInfo const&)
+			 *
+			 * Note: Patches the "CreateExplosion" call.
+			 *
+			 * How to find:
+			 * 1. Locate the "boomer_exploded" string.
+			 * 2. The function is located in the previous code block above that function call.
+			 * 3. The instruction should look like a function call.
+			 **/
+			"CKPatch_Boomer6CleanKill"
+			{
+				"signature"		"CTerrorPlayer::Event_Killed"
+				"linux"
+				{
+					"offset"		"6543" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"mac"
+				{
+					"offset"		"11511" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"windows"
+				{
+					"offset"		"7905" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+			}
+
+			/**
+			 * CTerrorPlayer::Event_Killed(CTakeDamageInfo const&)
+			 *
+			 * Note: Patches the "CBaseEntity::EmitSound" call for "SmokerZombie.Explode".
+			 * Note for Windows users: The server crashes when patching 5 bytes with NOPs (0x90), so do a jump (JMP) instruction instead.
+			 *
+			 * How to find:
+			 * 1. Locate the "SmokerZombie.Explode" string.
+			 * 2. The instruction should look like a function call.
+			 **/
+			"CKPatch_Smoker1CleanKill"
+			{
+				"signature"		"CTerrorPlayer::Event_Killed"
+				"linux"
+				{
+					"offset"		"10263" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"mac"
+				{
+					"offset"		"8828" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"windows"
+				{
+					"offset"		"8174" // start at D9 and patch 2 bytes with a short jump (0xEB) to skip instruction
+					"verify"		"\xD9"
+					"patch"			"\xEB\x12"
+				}
+			}
+
+			/**
+			 * CTerrorPlayer::Event_Killed(CTakeDamageInfo const&)
+			 *
+			 * Note: Patches the "DispatchParticleEffect" call for "smoker_smokecloud".
+			 *
+			 * How to find:
+			 * 1. Locate the "smoker_smokecloud" string.
+			 * 2. The instruction should look like a function call.
+			 **/
+			"CKPatch_Smoker2CleanKill"
+			{
+				"signature"		"CTerrorPlayer::Event_Killed"
+				"linux"
+				{
+					"offset"		"10419" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"mac"
+				{
+					"offset"		"9040" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"windows"
+				{
+					"offset"		"8266" // start at 8B and patch 2 bytes with a short jump (0xEB) to skip instruction
+					"verify"		"\x8B"
+					"patch"			"\xEB\x3A"
+				}
+			}
+
+			/**
+			 * CTerrorPlayer::Event_Killed(CTakeDamageInfo const&)
+			 *
+			 * Note: Patches the "DispatchParticleEffect" call for "smoker_smokecloud_camera".
+			 *
+			 * How to find:
+			 * 1. Locate the "smoker_smokecloud_camera" string.
+			 * 2. The instruction should look like a function call.
+			 **/
+			"CKPatch_Smoker3CleanKill"
+			{
+				"signature"		"CTerrorPlayer::Event_Killed"
+				"linux"
+				{
+					"offset"		"10611" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"mac"
+				{
+					"offset"		"9271" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+				"windows"
+				{
+					"offset"		"8480" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"verify"		"\xE8"
+					"patch"			"\x90\x90\x90\x90\x90"
+				}
+			}
+
+			/**
+			 * CSmokeCloudSystem::FireGameEvent(IGameEvent *)
+			 *
+			 * Note: Patches the "CSmokeCloudSystem::FireGameEvent" function to return early.
+			 *
+			 * How to find:
+			 * 1. Locate the "CSmokeCloudSystem::FireGameEvent" and start at the beginning of the function.
+			 **/
+			"CKPatch_Smoker4CleanKill"
+			{
+				"signature"		"CSmokeCloudSystem::FireGameEvent"
+				"linux"
+				{
+					"offset"		"0" // change 55 to C3
+					"verify"		"\x55"
+					"patch"			"\xC3"
+				}
+				"mac"
+				{
+					"offset"		"0" // change 55 to C3
+					"verify"		"\x55"
+					"patch"			"\xC3"
+				}
+				"windows"
+				{
+					"offset"		"0" // change 55 to C3
+					"verify"		"\x55"
+					"patch"			"\xC3"
+				}
+			}
+
+			/**
+			 * CTerrorPlayer::Event_Killed(CTakeDamageInfo const&)
+			 *
+			 * Note: Patches the "CTerrorPlayer::Event_Killed" function to skip a large portion of the Spitter death logic.
+			 *
+			 * How to find:
+			 * 1. Locate the "insect_swarm" string.
+			 * 2. Scroll up until you reach the if statement that checks for the Spitter class (4).
+			 * 3a. (Windows) The patch location should be a MOV instruction two lines before a 2-byte CALL instruction.
+			 * 3b. (Linux) The patch location should be a MOV instruction three lines before a 6-byte CALL instruction.
+			 * 4. The length of the JMP instruction patch will be determined by the following equation:
+			 * Let a1 = Address of the patch location + five bytes (because the patch itself takes five bytes)
+			 * Let a2 = Address of the start of the setup for the "CBaseEntity::EmitSound" call for "SpitterZombie.Death"
+			 * Equation: a2 - a1 = JMP instruction length
+			 **/
+			"CKPatch_SpitterCleanKill"
+			{
+				"signature"		"CTerrorPlayer::Event_Killed"
+				"linux"
+				{
+					"offset"		"12526" // start at 8B and patch 5 bytes with an unconditional jump (0xE9) to skip instruction
+					"verify"		"\x8B"
+					"patch"			"\xE9\xA5\x02\x00\x00"
+				}
+				"mac"
+				{
+					"offset"		"10068" // start at 8B and patch 5 bytes with an unconditional jump (0xE9) to skip instruction
+					"verify"		"\x8B"
+					"patch"			"\xE9\x15\x0A\x00\x00"
+				}
+				"windows"
+				{
+					"offset"		"9332" // start at 8B and patch 5 bytes with an unconditional jump (0xE9) to skip instruction
+					"verify"		"\x8B"
+					"patch"			"\xE9\x1A\x01\x00\x00"
+				}
+			}
+		}
+
+		"Offsets"
+		{
+			/**
+			 * CTerrorPlayer::Event_Killed(CTakeDamageInfo const&)
+			 *
+			 * Note: This is the offset for the "m_hAttacker" member variable in the "CTakeDamageInfo" class.
+			 *
+			 * How to find:
+			 * 1. Look in the alliedmodders/hl2sdk-l4d2 "takedamageinfo.h" file.
+			 * 2. Each member variable takes up 4 bytes for each of its cells (12 bytes for floats).
+			 **/
+			"CTerrorPlayer::Event_Killed::Attacker"
+			{
+				"linux"		"52"
+				"mac"		"52"
+				"windows"	"52"
+			}
+		}
+
+		"Signatures"
+		{
+			/**
+			 * CSmokeCloudSystem::FireGameEvent(IGameEvent *)
+			 *
+			 * How to find on Windows:
+			 * 1. Find the function's offsets with asherkin's VTable dump.
+			 * 2. In IDA Pro, go to the ".rdata" section of the Windows binary.
+			 * 3. Search for "CSmokeCloudSystem::`vftable'" to jump to the "CSmokeCloudSystem" vtable.
+			 * 4. Compare your dump's offsets with asherkin's dump's offsets to find the target function.
+			 * 5. Look for the target function in the Windows binary.
+			 **/
+			"CSmokeCloudSystem::FireGameEvent"
+			{
+				"library"	"server" // change 55 to C3
+				"linux"		"@_ZN17CSmokeCloudSystem13FireGameEventEP10IGameEvent"
+				"mac"		"@_ZN17CSmokeCloudSystem13FireGameEventEP10IGameEvent"
+				"windows"	"\x55\x8B\x2A\x83\x2A\x2A\x56\x8B\x2A\x2A\x8B\x2A\x8B\x2A\x2A\x57\x8B\x2A\x8B\x2A\xFF\x2A\x3D\x2A\x2A\x2A\x2A\x74\x2A\x68\x2A\x2A\x2A\x2A\x50\xE8\x2A\x2A\x2A\x2A\x83\x2A\x2A\x85\x2A\x0F\x85\x2A\x2A\x2A\x2A\x8B\x2A\x8B\x2A\x2A\x6A\x2A\x68\x2A\x2A\x2A\x2A\x8B\x2A\xFF\x2A\x50\xE8\x2A\x2A\x2A\x2A\x8B"
+						/* 55 8B ? 83 ? ? 56 8B ? ? 8B ? 8B ? ? 57 8B ? 8B ? FF ? 3D ? ? ? ? 74 ? 68 ? ? ? ? 50 E8 ? ? ? ? 83 ? ? 85 ? 0F 85 ? ? ? ? 8B ? 8B ? ? 6A ? 68 ? ? ? ? 8B ? FF ? 50 E8 ? ? ? ? 8B */
+			}
+
+			/**
+			 * CTerrorPlayer::Event_Killed(CTakeDamageInfo const&)
+			 *
+			 * How to find on Windows:
+			 * 1a. Search for any of the following strings (they can each only be found in this function):
+			 * - "charger_carry_kill"
+			 * - "blood_bleedout"
+			 * - "spitter_killed"
+			 * - "SubjectIsA:%s,Distance:%f"
+			 * - "DeadCharacter:"
+			 * - ",SubjectTeam:Survivor"
+			 * - "SurvivorDied"
+			 * - "pounce_attempt_stopped"
+			 * - "infected_explosive_barrel_kill"
+			 * - "mulletTongue"
+			 * - "charger_killed"
+			 * - "charging"
+			 * - "jockey_killed"
+			 * - "boomer_exploded"
+			 * - "splashedbile"
+			 *
+			 * 1b. Find the function's offsets with asherkin's VTable dump.
+			 * 2b. In IDA Pro, go to the ".rdata" section of the Windows binary.
+			 * 3b. Search for "CTerrorPlayer::`vftable'" to jump to the "CTerrorPlayer" vtable.
+			 * 4b. Compare your dump's offsets with asherkin's dump's offsets to find the target function.
+			 * 5b. Look for the target function in the Windows binary.
+			 **/
+			"CTerrorPlayer::Event_Killed"
+			{
+				"library"	"server"
+				"linux"		"@_ZN13CTerrorPlayer12Event_KilledERK15CTakeDamageInfo"
+				"mac"		"@_ZN13CTerrorPlayer12Event_KilledERK15CTakeDamageInfo"
+				"windows"	"\x2A\x2A\x2A\x2A\x2A\x2A\x83\x2A\x2A\x83\x2A\x2A\x55\x8B\x2A\x2A\x89\x2A\x2A\x2A\x8B\x2A\x81\xEC\x2A\x2A\x2A\x2A\xA1\x2A\x2A\x2A\x2A\x33\x2A\x89\x2A\x2A\x8B\x2A\x2A\x56\x8B\x2A\x8B\x2A\x89\x85\x2A\x2A\x2A\x2A\x8B\x82\x2A\x2A\x2A\x2A\x57\xFF\x2A\x8B\x2A\x8B"
+						/* ? ? ? ? ? ? 83 ? ? 83 ? ? 55 8B ? ? 89 ? ? ? 8B ? 81 EC ? ? ? ? A1 ? ? ? ? 33 ? 89 ? ? 8B ? ? 56 8B ? 8B ? 89 85 ? ? ? ? 8B 82 ? ? ? ? 57 FF ? 8B ? 8B */
+			}
+		}
+	}
+}
