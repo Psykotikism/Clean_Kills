@@ -17,7 +17,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define CK_VERSION "1.0"
+#define CK_VERSION "1.1"
 
 public Plugin myinfo =
 {
@@ -64,6 +64,15 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 #define CK_TAG4 "\x04[CK]\x04"
 #define CK_TAG5 "\x04[CK]\x05"
 
+// Hit groups
+#define CK_HITGROUP_HEAD (1 << 0) // headshots
+#define CK_HITGROUP_CHEST (1 << 1) // chest
+#define CK_HITGROUP_STOMACH (1 << 2) // stomach
+#define CK_HITGROUP_LEFTARM (1 << 3) // left arm
+#define CK_HITGROUP_RIGHTARM (1 << 4) // right arm
+#define CK_HITGROUP_LEFTLEG (1 << 5) // left leg
+#define CK_HITGROUP_RIGHTLEG (1 << 6) // right leg
+
 // Clean kill types
 #define CK_TYPE_BOOMER (1 << 0) // Boomer
 #define CK_TYPE_SMOKER (1 << 1) // Smoker
@@ -78,6 +87,7 @@ enum struct esGeneral
 	ConVar g_cvCKEnabledGameModes;
 	ConVar g_cvCKGameMode;
 	ConVar g_cvCKGameModeTypes;
+	ConVar g_cvCKHitGroups;
 	ConVar g_cvCKKillTypes;
 	ConVar g_cvCKPluginEnabled;
 
@@ -93,17 +103,24 @@ enum struct esGeneral
 
 esGeneral g_esGeneral;
 
-int g_iCleanKillTypes[MAXPLAYERS + 1];
+enum struct esPlayer
+{
+	int g_iCleanKillHitGroups;
+	int g_iCleanKillTypes;
+}
+
+esPlayer g_esPlayer[MAXPLAYERS + 1];
 
 public void OnPluginStart()
 {
 	LoadTranslations("common.phrases");
 
-	RegAdminCmd("sm_clean", cmdCKCleanKills, ADMFLAG_ROOT, "Set a player's clean kills type(s).");
+	RegAdminCmd("sm_clean", cmdCKCleanKills, ADMFLAG_ROOT, "Set a player's clean kills type(s) and hit group(s).");
 
 	g_esGeneral.g_cvCKDisabledGameModes = CreateConVar("l4d_clean_kills_disabled_gamemodes", "", "Disable Clean Kills in these game modes.\nSeparate by commas.\nEmpty: None\nNot empty: Disabled only in these game modes.", FCVAR_NOTIFY);
 	g_esGeneral.g_cvCKEnabledGameModes = CreateConVar("l4d_clean_kills_enabled_gamemodes", "", "Enable Clean Kills in these game modes.\nSeparate by commas.\nEmpty: All\nNot empty: Enabled only in these game modes.", FCVAR_NOTIFY);
 	g_esGeneral.g_cvCKGameModeTypes = CreateConVar("l4d_clean_kills_gamemode_types", "0", "Enable Clean Kills in these game mode types.\n0 OR 15: All game mode types.\n1: Co-Op modes only.\n2: Versus modes only.\n4: Survival modes only.\n8: Scavenge modes only. (Only available in Left 4 Dead 2.)", FCVAR_NOTIFY, true, 0.0, true, 15.0);
+	g_esGeneral.g_cvCKHitGroups = CreateConVar("l4d_clean_kills_hit_groups", "127", "Hit group(s) that trigger clean kills.\n1: Headshots only\n2: Chest shots only\n4: Stomach shots only\n8: Left arm shots only\n16: Right arm shots only\n32: Left leg shots only\n64: Right leg shots only\n127: ALL", _, true, 1.0, true, 127.0);
 	g_esGeneral.g_cvCKKillTypes = CreateConVar("l4d_clean_kills_kill_types", (g_bSecondGame ? "7" : "3"), "Type(s) of clean kills allowed.\n0: NONE\n1: Boomers only\n2: Smokers only\n4: Spitters only (Only available in Left 4 Dead 2.)\n7: ALL", _, true, 0.0, true, 7.0);
 	g_esGeneral.g_cvCKPluginEnabled = CreateConVar("l4d_clean_kills_enabled", "1", "Enable Clean Kills.\n0: OFF\n1: ON", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	CreateConVar("l4d_clean_kills_version", CK_VERSION, "Clean Kills Version", FCVAR_DONTRECORD|FCVAR_NOTIFY|FCVAR_REPLICATED|FCVAR_SPONLY);
@@ -189,16 +206,18 @@ Action cmdCKCleanKills(int client, int args)
 
 	switch (args)
 	{
-		case 1:
+		case 2:
 		{
 			int iLimit = g_bSecondGame ? 7 : 3;
-			g_iCleanKillTypes[client] = iClamp(GetCmdArgInt(1), -1, iLimit);
+			g_esPlayer[client].g_iCleanKillTypes = iClamp(GetCmdArgInt(1), -1, iLimit);
+			g_esPlayer[client].g_iCleanKillHitGroups = iClamp(GetCmdArgInt(2), -1, 127);
 
-			char sList[64];
-			vGetInfectedTypeList(g_iCleanKillTypes[client], sList, sizeof sList);
-			ReplyToCommand(client, "%s You now have\x05 clean kills\x01 on\x03 %s\x01.", CK_TAG2, sList);
+			char sTypes[32], sGroups[128];
+			vGetInfectedTypeList(g_esPlayer[client].g_iCleanKillTypes, sTypes, sizeof sTypes);
+			vGetHitGroupList(g_esPlayer[client].g_iCleanKillHitGroups, sGroups, sizeof sGroups);
+			ReplyToCommand(client, "%s You now have\x05 clean kills\x01 on\x03 %s\x01 with\x04 %s\x01.", CK_TAG2, sTypes, sGroups);
 		}
-		case 2:
+		case 3:
 		{
 			bool tn_is_ml;
 			char target[32], target_name[32];
@@ -211,17 +230,19 @@ Action cmdCKCleanKills(int client, int args)
 				return Plugin_Handled;
 			}
 
-			int iLimit = g_bSecondGame ? 7 : 3, iTypes = iClamp(GetCmdArgInt(2), -1, iLimit);
-			char sList[64];
-			vGetInfectedTypeList(iTypes, sList, sizeof sList);
+			int iLimit = g_bSecondGame ? 7 : 3, iTypes = iClamp(GetCmdArgInt(2), -1, iLimit), iGroups = iClamp(GetCmdArgInt(3), -1, 127);
+			char sTypes[32], sGroups[128];
+			vGetInfectedTypeList(iTypes, sTypes, sizeof sTypes);
+			vGetHitGroupList(iGroups, sGroups, sizeof sGroups);
 			for (int iPlayer = 0; iPlayer < target_count; iPlayer++)
 			{
 				if (bIsValidClient(target_list[iPlayer]))
 				{
-					g_iCleanKillTypes[target_list[iPlayer]] = iTypes;
+					g_esPlayer[target_list[iPlayer]].g_iCleanKillTypes = iTypes;
+					g_esPlayer[target_list[iPlayer]].g_iCleanKillHitGroups = iGroups;
 
-					ReplyToCommand(client, "%s You allowed\x05 %N\x01 to get clean kills on\x03 %s\x01.", CK_TAG2, target_list[iPlayer], sList);
-					PrintToChat(target_list[iPlayer], "%s You now have\x05 clean kills\x01 on\x03 %s\x01.", CK_TAG2, sList);
+					ReplyToCommand(client, "%s You allowed\x05 %N\x01 to get clean kills on\x03 %s\x01 with\x04 %s\x01.", CK_TAG2, target_list[iPlayer], sTypes, sGroups);
+					PrintToChat(target_list[iPlayer], "%s You now have\x05 clean kills\x01 on\x03 %s\x01 with\x04 %s\x01.", CK_TAG2, sTypes, sGroups);
 				}
 			}
 		}
@@ -229,7 +250,7 @@ Action cmdCKCleanKills(int client, int args)
 		{
 			char sCmd[32];
 			GetCmdArg(0, sCmd, sizeof sCmd);
-			ReplyToCommand(client, "%s Usage: %s <-1: OFF|0: Use Cvar|1: Boomers|2: Smokers|%s>", CK_TAG2, sCmd, (g_bSecondGame ? "4: Spitters|7: ALL" : "3: ALL"));
+			ReplyToCommand(client, "%s Usage: %s <-1: OFF|0: Use Cvar|1: Boomers|2: Smokers|%s> <1-127: Hit groups>", CK_TAG2, sCmd, (g_bSecondGame ? "4: Spitters|7: ALL" : "3: ALL"));
 		}
 	}
 
@@ -241,8 +262,11 @@ MRESReturn mreEventKilledPre(int pThis, DHookParam hParams)
 	int iAttacker = hParams.GetObjectVar(1, g_esGeneral.g_iAttackerOffset, ObjectValueType_Ehandle);
 	if (bIsInfected(pThis, CK_CHECK_INDEX|CK_CHECK_INGAME) && bIsSurvivor(iAttacker))
 	{
-		int iTypes = (g_iCleanKillTypes[iAttacker] != 0) ? g_iCleanKillTypes[iAttacker] : g_esGeneral.g_cvCKKillTypes.IntValue;
-		if (iTypes > 0)
+		int iTypes = (g_esPlayer[iAttacker].g_iCleanKillTypes != 0) ? g_esPlayer[iAttacker].g_iCleanKillTypes : g_esGeneral.g_cvCKKillTypes.IntValue,
+			iGroups = (g_esPlayer[iAttacker].g_iCleanKillHitGroups != 0) ? g_esPlayer[iAttacker].g_iCleanKillHitGroups : g_esGeneral.g_cvCKHitGroups.IntValue,
+			iBit = (GetEntProp(pThis, Prop_Data, "m_LastHitGroup") - 1),
+			iFlag = (1 << iBit);
+		if (iTypes > 0 && iGroups != 0 && (iGroups & iFlag))
 		{
 			if (bIsBoomer(pThis, CK_CHECK_INDEX|CK_CHECK_INGAME) && (iTypes & CK_TYPE_BOOMER))
 			{
@@ -317,8 +341,8 @@ void vEventHandler(Event event, const char[] name, bool dontBroadcast)
 				iPlayerId = event.GetInt("player"), iPlayer = GetClientOfUserId(iPlayerId);
 			if (bIsValidClient(iBot) && bIsSurvivor(iPlayer))
 			{
-				g_iCleanKillTypes[iPlayer] = g_iCleanKillTypes[iBot];
-				g_iCleanKillTypes[iBot] = 0;
+				g_esPlayer[iPlayer].g_iCleanKillTypes = g_esPlayer[iBot].g_iCleanKillTypes;
+				g_esPlayer[iBot].g_iCleanKillTypes = 0;
 			}
 		}
 		else if (StrEqual(name, "player_bot_replace"))
@@ -327,29 +351,168 @@ void vEventHandler(Event event, const char[] name, bool dontBroadcast)
 				iBotId = event.GetInt("bot"), iBot = GetClientOfUserId(iBotId);
 			if (bIsValidClient(iPlayer) && bIsSurvivor(iBot))
 			{
-				g_iCleanKillTypes[iBot] = g_iCleanKillTypes[iPlayer];
-				g_iCleanKillTypes[iPlayer] = 0;
+				g_esPlayer[iBot].g_iCleanKillTypes = g_esPlayer[iPlayer].g_iCleanKillTypes;
+				g_esPlayer[iPlayer].g_iCleanKillTypes = 0;
 			}
 		}
 		else if (StrEqual(name, "player_connect") || StrEqual(name, "player_disconnect"))
 		{
 			int iSurvivorId = event.GetInt("userid"), iSurvivor = GetClientOfUserId(iSurvivorId);
-			g_iCleanKillTypes[iSurvivor] = 0;
+			g_esPlayer[iSurvivor].g_iCleanKillTypes = 0;
+		}
+	}
+}
+
+void vGetHitGroupList(int groups, char[] buffer, int size)
+{
+	if (groups == 0)
+	{
+		groups = g_esGeneral.g_cvCKHitGroups.IntValue;
+	}
+
+	if (groups == -1)
+	{
+		FormatEx(buffer, size, "nothing");
+
+		return;
+	}
+
+	bool bListed = false;
+	if (groups & CK_HITGROUP_HEAD)
+	{
+		bListed = true;
+
+		FormatEx(buffer, size, "headshots");
+	}
+
+	if ((groups & CK_HITGROUP_CHEST) && (groups & CK_HITGROUP_STOMACH))
+	{
+		switch (bListed)
+		{
+			case true: Format(buffer, size, "%s\x01,\x04 bodyshots", buffer);
+			case false:
+			{
+				bListed = true;
+
+				FormatEx(buffer, size, "bodyshots");
+			}
+		}
+	}
+	else if (groups & CK_HITGROUP_CHEST)
+	{
+		switch (bListed)
+		{
+			case true: Format(buffer, size, "%s\x01,\x04 chest shots", buffer);
+			case false:
+			{
+				bListed = true;
+
+				FormatEx(buffer, size, "chest shots");
+			}
+		}
+	}
+	else if (groups & CK_HITGROUP_STOMACH)
+	{
+		switch (bListed)
+		{
+			case true: Format(buffer, size, "%s\x01,\x04 stomach shots", buffer);
+			case false:
+			{
+				bListed = true;
+
+				FormatEx(buffer, size, "stomach shots");
+			}
+		}
+	}
+
+	if ((groups & CK_HITGROUP_LEFTARM) && (groups & CK_HITGROUP_RIGHTARM))
+	{
+		switch (bListed)
+		{
+			case true: Format(buffer, size, "%s\x01,\x04 arm shots", buffer);
+			case false:
+			{
+				bListed = true;
+
+				FormatEx(buffer, size, "arm shots");
+			}
+		}
+	}
+	else if (groups & CK_HITGROUP_LEFTARM)
+	{
+		switch (bListed)
+		{
+			case true: Format(buffer, size, "%s\x01,\x04 left arm shots", buffer);
+			case false:
+			{
+				bListed = true;
+
+				FormatEx(buffer, size, "left arm shots");
+			}
+		}
+	}
+	else if (groups & CK_HITGROUP_RIGHTARM)
+	{
+		switch (bListed)
+		{
+			case true: Format(buffer, size, "%s\x01,\x04 right arm shots", buffer);
+			case false:
+			{
+				bListed = true;
+
+				FormatEx(buffer, size, "right arm shots");
+			}
+		}
+	}
+
+	if ((groups & CK_HITGROUP_LEFTLEG) && (groups & CK_HITGROUP_RIGHTLEG))
+	{
+		switch (bListed)
+		{
+			case true: Format(buffer, size, "%s\x01,\x04 leg shots", buffer);
+			case false:
+			{
+				bListed = true;
+
+				FormatEx(buffer, size, "leg shots");
+			}
+		}
+	}
+	else if (groups & CK_HITGROUP_LEFTLEG)
+	{
+		switch (bListed)
+		{
+			case true: Format(buffer, size, "%s\x01,\x04 left leg shots", buffer);
+			case false:
+			{
+				bListed = true;
+
+				FormatEx(buffer, size, "left leg shots");
+			}
+		}
+	}
+	else if (groups & CK_HITGROUP_RIGHTLEG)
+	{
+		switch (bListed)
+		{
+			case true: Format(buffer, size, "%s\x01,\x04 right leg shots", buffer);
+			case false: FormatEx(buffer, size, "right leg shots");
 		}
 	}
 }
 
 void vGetInfectedTypeList(int types, char[] buffer, int size)
 {
+	if (types == 0)
+	{
+		types = g_esGeneral.g_cvCKKillTypes.IntValue;
+	}
+
 	if (types == -1)
 	{
 		FormatEx(buffer, size, "nothing");
 
 		return;
-	}
-	else if (types == 0)
-	{
-		types = g_esGeneral.g_cvCKKillTypes.IntValue;
 	}
 
 	bool bListed = false;

@@ -20,6 +20,8 @@ Kill swiftly, efficiently, and professionally.
 ## Credits
 **epz/epzminion** - For helping with gamedata information, giving the original idea, and overall invaluable input.
 
+**Lux/LuxLuma** - For suggesting an idea about hit groups.
+
 **SourceMod Team** - For continually updating/improving SourceMod.
 
 ## Requirements
@@ -43,15 +45,15 @@ Kill swiftly, efficiently, and professionally.
 ## Commands
 ```
 // Accessible by admins with "z" (Root) flag only.
-sm_clean - Set a player's clean kills type(s).
+sm_clean - Set a player's clean kills type(s) and hit group(s).
 
 L4D1:
-- Usage: sm_clean <-1: OFF|0: Use Cvar|1: Boomers|2: Smokers|3: ALL>
-- Usage: sm_clean <#userid|name> <-1: OFF|0: Use Cvar|1: Boomers|2: Smokers|3: ALL>
+- Usage: sm_clean <-1: OFF|0: Use Cvar|1: Boomers|2: Smokers|3: ALL> <1-127: Hit groups>
+- Usage: sm_clean <#userid|name> <-1: OFF|0: Use Cvar|1: Boomers|2: Smokers|3: ALL> <1-127: Hit groups>
 
 L4D2:
-- Usage: sm_clean <-1: OFF|0: Use Cvar|1: Boomers|2: Smokers|4: Spitters|7: ALL>
-- Usage: sm_clean <#userid|name> <-1: OFF|0: Use Cvar|1: Boomers|2: Smokers|4: Spitters|7: ALL>
+- Usage: sm_clean <-1: OFF|0: Use Cvar|1: Boomers|2: Smokers|4: Spitters|7: ALL> <1-127: Hit groups>
+- Usage: sm_clean <#userid|name> <-1: OFF|0: Use Cvar|1: Boomers|2: Smokers|4: Spitters|7: ALL> <1-127: Hit groups>
 ```
 
 ## ConVar Settings
@@ -92,6 +94,21 @@ l4d_clean_kills_enabled_gamemodes ""
 // Minimum: "0.000000"
 // Maximum: "15.000000"
 l4d_clean_kills_gamemode_types "0"
+
+// Hit group(s) that trigger clean kills.
+// 1: Headshots only
+// 2: Chest shots only
+// 4: Stomach shots only
+// 8: Left arm shots only
+// 16: Right arm shots only
+// 32: Left leg shots only
+// 64: Right leg shots only
+// 127: ALL
+// -
+// Default: "127"
+// Minimum: "1.000000"
+// Maximum: "127.000000"
+l4d_clean_kills_hit_groups "127"
 
 // Type(s) of clean kills allowed.
 // 0: NONE
