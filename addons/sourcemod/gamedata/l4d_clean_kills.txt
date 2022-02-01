@@ -51,7 +51,7 @@
 				"signature"		"CTerrorPlayer::Event_Killed"
 				"linux"
 				{
-					"offset"		"7186" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"offset"		"6892" // start at E8 and patch 5 bytes with NOPs (0x90)
 					"verify"		"\xE8"
 					"patch"			"\x90\x90\x90\x90\x90"
 				}
@@ -83,7 +83,7 @@
 				"signature"		"CTerrorPlayer::Event_Killed"
 				"linux"
 				{
-					"offset"		"7220" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"offset"		"6926" // start at E8 and patch 5 bytes with NOPs (0x90)
 					"verify"		"\xE8"
 					"patch"			"\x90\x90\x90\x90\x90"
 				}
@@ -116,7 +116,7 @@
 				"signature"		"CTerrorPlayer::Event_Killed"
 				"linux"
 				{
-					"offset"		"5752" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"offset"		"5633" // start at E8 and patch 5 bytes with NOPs (0x90)
 					"verify"		"\xE8"
 					"patch"			"\x90\x90\x90\x90\x90"
 				}
@@ -149,7 +149,7 @@
 				"signature"		"CTerrorPlayer::Event_Killed"
 				"linux"
 				{
-					"offset"		"7366" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"offset"		"7072" // start at E8 and patch 5 bytes with NOPs (0x90)
 					"verify"		"\xE8"
 					"patch"			"\x90\x90\x90\x90\x90"
 				}
@@ -181,7 +181,7 @@
 				"signature"		"CTerrorPlayer::Event_Killed"
 				"linux"
 				{
-					"offset"		"7529" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"offset"		"7235" // start at E8 and patch 5 bytes with NOPs (0x90)
 					"verify"		"\xE8"
 					"patch"			"\x90\x90\x90\x90\x90"
 				}
@@ -213,7 +213,7 @@
 				"signature"		"CTerrorPlayer::Event_Killed"
 				"linux"
 				{
-					"offset"		"7712" // start at E8 and patch 5 bytes with NOPs (0x90)
+					"offset"		"7418" // start at E8 and patch 5 bytes with NOPs (0x90)
 					"verify"		"\xE8"
 					"patch"			"\x90\x90\x90\x90\x90"
 				}
