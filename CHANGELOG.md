@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 1.2 (February 1, 2022)
+
+### Changes
+
+#### Game Data
+- L4D1: Updated several offsets for the `1.0.4.1` game update.
+
 ## Version 1.1 (January 29, 2022)
 
 ### Bug Fixes
