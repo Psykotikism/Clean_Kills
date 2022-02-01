@@ -17,7 +17,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define CK_VERSION "1.1"
+#define CK_VERSION "1.2"
 
 public Plugin myinfo =
 {
