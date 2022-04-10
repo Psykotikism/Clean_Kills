@@ -17,7 +17,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define CK_VERSION "1.2"
+#define CK_VERSION "1.3"
 
 public Plugin myinfo =
 {
@@ -120,8 +120,8 @@ public void OnPluginStart()
 	g_esGeneral.g_cvCKDisabledGameModes = CreateConVar("l4d_clean_kills_disabled_gamemodes", "", "Disable Clean Kills in these game modes.\nSeparate by commas.\nEmpty: None\nNot empty: Disabled only in these game modes.", FCVAR_NOTIFY);
 	g_esGeneral.g_cvCKEnabledGameModes = CreateConVar("l4d_clean_kills_enabled_gamemodes", "", "Enable Clean Kills in these game modes.\nSeparate by commas.\nEmpty: All\nNot empty: Enabled only in these game modes.", FCVAR_NOTIFY);
 	g_esGeneral.g_cvCKGameModeTypes = CreateConVar("l4d_clean_kills_gamemode_types", "0", "Enable Clean Kills in these game mode types.\n0 OR 15: All game mode types.\n1: Co-Op modes only.\n2: Versus modes only.\n4: Survival modes only.\n8: Scavenge modes only. (Only available in Left 4 Dead 2.)", FCVAR_NOTIFY, true, 0.0, true, 15.0);
-	g_esGeneral.g_cvCKHitGroups = CreateConVar("l4d_clean_kills_hit_groups", "127", "Hit group(s) that trigger clean kills.\n1: Headshots only\n2: Chest shots only\n4: Stomach shots only\n8: Left arm shots only\n16: Right arm shots only\n32: Left leg shots only\n64: Right leg shots only\n127: ALL", _, true, 1.0, true, 127.0);
-	g_esGeneral.g_cvCKKillTypes = CreateConVar("l4d_clean_kills_kill_types", (g_bSecondGame ? "7" : "3"), "Type(s) of clean kills allowed.\n0: NONE\n1: Boomers only\n2: Smokers only\n4: Spitters only (Only available in Left 4 Dead 2.)\n7: ALL", _, true, 0.0, true, 7.0);
+	g_esGeneral.g_cvCKHitGroups = CreateConVar("l4d_clean_kills_hit_groups", "127", "Hit group(s) that trigger clean kills.\n1: Headshots only\n2: Chest shots only\n4: Stomach shots only\n8: Left arm shots only\n16: Right arm shots only\n32: Left leg shots only\n64: Right leg shots only\n127: ALL", FCVAR_NOTIFY, true, 1.0, true, 127.0);
+	g_esGeneral.g_cvCKKillTypes = CreateConVar("l4d_clean_kills_kill_types", (g_bSecondGame ? "7" : "3"), "Type(s) of clean kills allowed.\n0: NONE\n1: Boomers only\n2: Smokers only\n4: Spitters only (Only available in Left 4 Dead 2.)\n7: ALL", FCVAR_NOTIFY, true, 0.0, true, 7.0);
 	g_esGeneral.g_cvCKPluginEnabled = CreateConVar("l4d_clean_kills_enabled", "1", "Enable Clean Kills.\n0: OFF\n1: ON", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	CreateConVar("l4d_clean_kills_version", CK_VERSION, "Clean Kills Version", FCVAR_DONTRECORD|FCVAR_NOTIFY|FCVAR_REPLICATED|FCVAR_SPONLY);
 	AutoExecConfig(true, "l4d_clean_kills");

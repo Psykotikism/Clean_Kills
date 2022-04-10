@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 1.3 (April 10, 2022)
+
+### Bug Fixes
+
+#### ConVars
+- Fixed some convars not having the `FCVAR_NOTIFY` flag.
+
 ## Version 1.2 (February 1, 2022)
 
 ### Changes
