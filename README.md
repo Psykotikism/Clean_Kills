@@ -5,6 +5,7 @@
 
 ## License
 > The following license is placed inside the source code of the plugin.
+
 Clean Kills: a L4D/L4D2 SourceMod Plugin
 Copyright (C) 2022  Alfred "Psyk0tik" Llagas
 
@@ -22,7 +23,7 @@ Kill swiftly, efficiently, and professionally.
 
 **Lux/LuxLuma** - For suggesting an idea about hit groups.
 
-**SourceMod Team** - For continually updating/improving SourceMod.
+**SourceMod Team** - For continually updating/improving `SourceMod`.
 
 ## Requirements
 1. `SourceMod 1.11.0.6724` or higher
@@ -137,7 +138,7 @@ l4d_clean_kills_kill_types "7"
 
 ## Disabling
 1. Move `l4d_clean_kills.smx` to the `plugins/disabled` folder.
-2. Unload Clean Kills by typing `sm plugins unload l4d_clean_kills` in the server console.
+2. Unload `Clean Kills` by typing `sm plugins unload l4d_clean_kills` in the server console.
 
 ## Third-Party Revisions Notice
 If you would like to share your own revisions of this plugin, please rename the files so that there is no confusion for users.
